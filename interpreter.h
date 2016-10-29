@@ -64,72 +64,74 @@ FILE *out;
         char instruction = instructions[pc];
         /* printf("program counter: %d, instruction: %c, address: %d, value: %d\n", pc, instruction, dp_addr, dp->value); */
         /* execute */
-        if (instruction == '+') {
-            dp->value++;
-        }
-        else if (instruction == '-') {
-            dp->value--;
-        }
-        else if (instruction == '<') {
-            if (dp->prev == NULL) {
-                dp->prev = calloc(1, sizeof(struct cell));
-                if (dp->prev == NULL) return ERR;
-                dp->prev->next = dp;
-            }
-            dp = dp->prev;
-            dp_addr--;
-        }
-        else if (instruction == '>') {
-            if (dp->next == NULL) {
-                dp->next = calloc(1, sizeof(struct cell));
-                if (dp->next == NULL) return ERR;
-                dp->next->prev = dp;
-            }
-            dp = dp->next;
-            dp_addr++;
-        }
-        else if (instruction == ',') {
-            if (in != NULL && !feof(in)) {
-                dp->value = getc(in);
-            } else {
-                return ERR;
-            }
-        }
-        else if (instruction == '.') {
-            if (out != NULL) {
-                putc(dp->value, out);
-            } else {
-                return ERR;
-            }
-        }
-        else if (instruction == '[') {
-            if (dp->value == 0) {
-                brackets = 0;
-                do {
-                    pc++;
-                    if (instructions[pc] == '[') {
-                        brackets++;
-                    }
-                    else if (instructions[pc] == ']') {
-                        brackets--;
-                    }
-                } while (brackets == 0 || instructions[pc] != ']');
-            }
-        }
-        else if (instruction == ']') {
-            if (dp->value != 0) {
-                brackets = 0;
-                do {
-                    pc--;
-                    if (instructions[pc] == '[') {
-                        brackets++;
-                    }
-                    else if (instructions[pc] == ']') {
-                        brackets--;
-                    }
-                } while (brackets == 0 || instructions[pc] != '[');
-            }
-        }
+		switch (instruction) {
+			case '+':
+				dp->value++;
+				break;
+			case '-':
+				dp->value--;
+				break;
+			case '<':
+				if (dp->prev == NULL) {
+					dp->prev = calloc(1, sizeof(struct cell));
+					if (dp->prev == NULL) return ERR;
+					dp->prev->next = dp;
+				}
+				dp = dp->prev;
+				dp_addr--;
+				break;
+			case '>':
+				if (dp->next == NULL) {
+					dp->next = calloc(1, sizeof(struct cell));
+					if (dp->next == NULL) return ERR;
+					dp->next->prev = dp;
+				}
+				dp = dp->next;
+				dp_addr++;
+				break;
+			case ',':
+				if (in != NULL && !feof(in)) {
+					dp->value = getc(in);
+				} else {
+					return ERR;
+				}
+				break;
+			case '.':
+				if (out != NULL) {
+					putc(dp->value, out);
+				} else {
+					return ERR;
+				}
+				break;
+			case '[':
+				if (dp->value == 0) {
+					brackets = 0;
+					do {
+						pc++;
+						if (instructions[pc] == '[') {
+							brackets++;
+						}
+						else if (instructions[pc] == ']') {
+							brackets--;
+						}
+					} while (brackets == 0 || instructions[pc] != ']');
+				}
+				break;
+			case ']':
+				if (dp->value != 0) {
+					brackets = 0;
+					do {
+						pc--;
+						if (instructions[pc] == '[') {
+							brackets++;
+						}
+						else if (instructions[pc] == ']') {
+							brackets--;
+						}
+					} while (brackets == 0 || instructions[pc] != '[');
+				}
+				break;
+		}
         /* increment data pointer */
         pc++;
     }
